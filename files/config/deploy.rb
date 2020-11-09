@@ -1,48 +1,41 @@
-STDOUT.sync = true
-set :stages, %w(production)
-set :default_stage, 'production'
+`ssh-add`
 
-require 'mina/bundler'
-require 'mina/rails'
-require 'mina/git'
-require 'mina/rbenv'
-require 'mina/puma'
-require "mina_sidekiq/tasks"
-require 'mina/logs'
-require 'mina/multistage'
+set :application, "my_app"
+set :repo_url, "git@github.com:xx/xxx.git"
+set :whenever_identifier, -> {"#{fetch(:application)}_#{fetch(:stage)}"}
+set :passenger_restart_with_touch, true
 
-set :asset_dirs, fetch(:asset_dirs, []).push('app/javascript')
-set :shared_dirs, fetch(:shared_dirs, []).push('log', 'public/uploads', 'public/packs', 'node_modules', 'storage')
-set :shared_files, fetch(:shared_files, []).push('config/database.yml', 'config/application.yml')
+shared_dirs = %w(
+log
+tmp/pids
+tmp/cache
+tmp/sockets
+public/system
+public/uploads
+node_modules
+storage
+)
+append :linked_dirs, *shared_dirs
 
-set :puma_config, ->{ "#{fetch(:current_path)}/config/puma.rb" }
-set :sidekiq_pid, ->{ "#{fetch(:shared_path)}/tmp/pids/sidekiq.pid" }
+shared_files = %w(
+config/database.yml
+config/secrets.yml
+config/sidekiq.yml
+config/application.yml
+)
+append :linked_files, *shared_files
 
-task :remote_environment do
-  invoke :'rbenv:load'
+namespace :deploy do
+  after :finishing, :'passenger:restart'
+  after :finishing, :setup
+  after :finishing, :clear_bootsnap
 end
 
 task :setup do
-  command %[mkdir -p "#{fetch(:shared_path)}/tmp/sockets"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/tmp/sockets"]
-
-  command %[mkdir -p "#{fetch(:shared_path)}/tmp/pids"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/tmp/pids"]
-
-  command %[mkdir -p "#{fetch(:shared_path)}/log"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/log"]
-
-  command %[mkdir -p "#{fetch(:shared_path)}/public/uploads"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/public/uploads"]
-
-  command %[mkdir -p "#{fetch(:shared_path)}/public/packs"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/public/packs"]
-
-  command %[mkdir -p "#{fetch(:shared_path)}/node_modules"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/node_modules"]
-
-  command %[mkdir -p "#{fetch(:shared_path)}/storage"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/storage"]
+  shared_dirs.each do |dir|
+    command %[mkdir -p "#{fetch(:shared_path)}/#{dir}"]
+    command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/#{dir}"]
+  end
 
   command %[mkdir -p "#{fetch(:shared_path)}/config"]
   command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/config"]
@@ -60,48 +53,3 @@ task :clear_bootsnap do
   command %[rm -rf "#{fetch(:shared_path)}/tmp/bootsnap-*"]
 end
 
-desc "Deploys the current version to the server."
-task :deploy do
-  command %[echo "-----> Server: #{fetch(:domain)}"]
-  command %[echo "-----> Path: #{fetch(:deploy_to)}"]
-  command %[echo "-----> Branch: #{fetch(:branch)}"]
-
-  deploy do
-    invoke :'git:clone'
-    invoke :'deploy:link_shared_paths'
-    invoke :'bundle:install'
-    invoke :'rails:db_migrate'
-    invoke :clear_bootsnap
-    invoke :'rails:assets_precompile'
-    invoke :'deploy:cleanup'
-
-    on :launch do
-      invoke :'rbenv:load'
-      invoke :'sidekiq:quiet'
-      invoke :'puma:smart_restart'
-      invoke :'sidekiq:restart'
-    end
-  end
-end
-
-desc "Prepare the first deploy on server."
-task :first_deploy do
-  command %[echo "-----> Server: #{fetch(:domain)}"]
-  command %[echo "-----> Path: #{fetch(:deploy_to)}"]
-  command %[echo "-----> Branch: #{fetch(:branch)}"]
-
-  deploy do
-    invoke :'git:clone'
-    invoke :'deploy:link_shared_paths'
-    invoke :'bundle:install'
-    invoke :'rails:assets_precompile'
-    invoke :'deploy:cleanup'
-
-    on :launch do
-      invoke :'rbenv:load'
-      invoke :'rails:db_create'
-      invoke :'rails', 'db:migrate'
-      invoke :'rails', 'db:seed'
-    end
-  end
-end

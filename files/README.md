@@ -15,16 +15,16 @@ Install dependencies:
 
 * rails 6
 
-    Using `rbenv`, update `ruby` up to 2.5 or higher, and install `rails 6.0.0`
+    Using `rvm`, update `ruby` up to 2.5 or higher, and install `rails 6.0.0`
 
     ```bash
-    $ ruby -v ( output should be 2.5.x or 2.6.x )
+    $ ruby -v ( output should be 2.5.x or higher )
 
     $ gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.com/` (optional, Chinese developer recommend)
 
     $ gem install rails
 
-    $ rails -v ( output should be rails 6.0.0 )
+    $ rails -v ( output should be rails 6.0.0 or higher )
     ```
 
 * yarn
@@ -54,24 +54,22 @@ Default password: admin
 ## Tech stack
 
 * Ruby on Rails 6.0
-* bootstrap 4
-* font-awesome 5
-* figaro
 * postgres
-* slim
-* simple_form
+* figaro
 * high_voltage
-* active_storage
+* redis
 * sidekiq
+* devise
 * kaminari
-* mina
+* capistrano
 * puma
 * rspec
-* adminlte 3
+* annotate
+* sentry
 
 ## Built with
 
-[dao42/rails-template](https://github.com/dao42/rails-template)
+[jiz4oh/rails-template](https://github.com/jiz4oh/rails-template)
 
 ## LICENSE
 

@@ -1,22 +1,17 @@
-# dao42/rails-template
+# jiz4oh/rails-template
 
-**dao42/rails-template has supported the newest rails 6.0.0 project setup**
+**jiz4oh/rails-template has supported the newest rails 6.0.0 project setup, forked from [dao42/rails-template](https://github.com/dao42/rails-template)**
 
 Maybe the best & newest & fastest rails template for senior rails developer.
 
 It maybe the best starting for your new rails project.
 
-An example built with rails-template: https://github.com/dao42/rails-template-example
-
-
 ## Core Idea
 
-`dao42/rails-template` apply lots of good components for you to make development damn quick.
+`jiz4oh/rails-template` apply lots of good components for you to make development damn quick.
 
-1. `dao42/rails-template` keep the newest easily because it's a real `Rails Application Template`.
-2. `dao42/rails-template` love the newest standard components of Rails 6, using `webpacker` and remove `assets pipeline`.
-3. `dao42/rails-template` is out-of-box for your development based on `bootstrap4`.
-4. `dao42/rails-template` is out-of-box for your deployment based on `mina`.
+1. `jiz4oh/rails-template` keep the newest easily because it's a real `Rails Application Template`.
+2. `jiz4oh/rails-template` love the newest standard components of Rails 6, using `webpacker` and remove `assets pipeline`.
 
 ## How to use
 
@@ -62,7 +57,7 @@ Then,
 
 2. Create your own rails app applying `rails-template`
 
-    `$ rails new myapp -m https://raw.githubusercontent.com/dao42/rails-template/master/composer.rb`
+    `$ rails new myapp -m https://raw.githubusercontent.com/jiz4oh/rails-template/master/composer.rb`
 
     Important!! replace `myapp` to your real project name, we will generate lots of example files by this name.
 
@@ -70,47 +65,21 @@ Then,
 
     `$ rails s`
 
-## What we do
-
-`rails-template` apply lots of good components for you to make development damn quick.
-
-1. `ActionCable` and `Turbolinks` features are opened by default.
-
-2. `Bootstrap4` and `font-awesome` are integrated to make your products UI easily, it aslo has some example pages for you to quickly start.
-
-3. `active_storage` and `local` file mode are opened by default.
-
-4. `mina` and its plugins are out-of-box for your deployment.
-
-5. `slim`, `simple_form`, `kaminari`, `high_voltage` are installed.
-
-6. `adminlte 3` is ready for your administrator dashboard.
-
-7. `rspec`, `factory_bot_rails`, `database_cleaner` are ready for your testing automation.
-
-8. Zero-down phase-restart mode is out-of-box with `mina-ng-puma`.
-
-9. `monit`, `nginx example`, `https ssl example`, `logrotate`, `backup example` is ready for you.
-
-Other gems integrated in rails-template are worth learning seriously.
-
 ## Integrated mainly technology stack and gems
 
 * Ruby on Rails 6.0
-* bootstrap 4
-* font-awesome 5
-* figaro
 * postgres
-* slim
-* simple_form
+* figaro
 * high_voltage
-* active_storage
+* redis
 * sidekiq
+* devise
 * kaminari
-* mina
+* capistrano
 * puma
 * rspec
-* adminlte 3
+* annotate
+* sentry3
 
 ## Starting with webpacker document
 
@@ -118,18 +87,13 @@ Other gems integrated in rails-template are worth learning seriously.
 
 ## Deployment document
 
-* [How to deploy to ubuntu 16.10 with rails-template step by step(zh-CN)](https://github.com/dao42/rails-template/wiki/how-to-deploy-rails-to-ubuntu1404-with-rails-template)
-
-## Roadmap
+* [How to deploy to ubuntu 16.10 with rails-template step by step(zh-CN)](https://github.com/jiz4oh/rails-template/wiki/how-to-deploy-rails-to-ubuntu1404-with-rails-template)
 
 * [x] Add AdminLTE as admin dashboard
 
-## Projects that using `dao42/rails-template`
+## Projects that using `jiz4oh/rails-template`
 
-Welcome to pull request here to update this if you choose `dao42/rails-template` for your new rails app.
-
-* [danmai weapp SAAS platform](https://www.danmai.com.cn)
-* [dao42 official website](https://www.dao42.com)
+Welcome to pull request here to update this if you choose `jiz4oh/rails-template` for your new rails app.
 
 ## LICENSE
 
