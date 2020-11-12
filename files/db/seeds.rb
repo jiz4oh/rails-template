@@ -1,3 +1,3 @@
 puts 'Creating admin user...'
-Administrator.create_with(password: 'admin')
-  .find_or_create_by!(name: 'admin')
+Admin.create_with(password: 'admin')
+     .find_or_create_by!(username: 'admin@admin.com')

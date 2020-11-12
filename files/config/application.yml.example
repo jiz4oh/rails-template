@@ -10,3 +10,6 @@ SIDEKIQ_DB: '1'
 
 # google anlytics
 GA: ''
+
+# sentry secret key
+SENTRY_SECRET: ''
