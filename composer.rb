@@ -2,7 +2,6 @@ require_relative 'composer_helper'
 
 $USE_CUSTOM_CONFIG = no? 'Would you like to setup default configs? [y|n]'
 
-$TEMPLATE_REPO_URL = ask_for_config('Where is the template-config dir?', 'https://raw.githubusercontent.com/jiz4oh/rails-template/master/files/')
 $DEST_APP_ROOT_PATH = ask_for_config('What dir would you like to deploy on the server', '/home/deploy/apps')
 DEVISE_MODEL_NAME = ask_for_config('What would you like the user model to be called?', "user")
 GIT_REPO_URL = ask_for_config('Where is git repository?', 'localhost')
