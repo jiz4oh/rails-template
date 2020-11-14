@@ -78,22 +78,22 @@ gem 'capistrano3-nginx', require: false
 get_remote('Capfile')
 get_remote('config/deploy.rb')
 create_file 'config/deploy/production.rb' do
-<<-EOF
-set :repo_url, '#{GIT_REPO_URL}'
-set :branch, :master
-server '#{DEPLOY_SERVER}', user: '#{DEPLOY_USER}', roles: %w{app db web}
-set :deploy_to, "/data/www/\#{fetch(:application)}"
-set :ssh_options, {forward_agent: true}
-EOF
+  <<-EOF.strip_heredoc
+    set :repo_url, '#{GIT_REPO_URL}'
+    set :branch, :master
+    server '#{DEPLOY_SERVER}', user: '#{DEPLOY_USER}', roles: %w{app db web}
+    set :deploy_to, "/data/www/\#{fetch(:application)}"
+    set :ssh_options, {forward_agent: true}
+  EOF
 end
 create_file 'config/deploy/staging.rb' do
-<<-EOF
-set :repo_url, '#{GIT_REPO_URL}'
-set :branch, :staging
-server '#{DEPLOY_SERVER}', user: '#{DEPLOY_USER}', roles: %w{app db web}
-set :deploy_to, "/data/www/\#{fetch(:application)}_staging"
-set :ssh_options, {forward_agent: true}
-EOF
+  <<-EOF.strip_heredoc
+    set :repo_url, '#{GIT_REPO_URL}'
+    set :branch, :staging
+    server '#{DEPLOY_SERVER}', user: '#{DEPLOY_USER}', roles: %w{app db web}
+    set :deploy_to, "/data/www/\#{fetch(:application)}_staging"
+    set :ssh_options, {forward_agent: true}
+  EOF
 end
 
 say 'apply figaro & secret config'
@@ -116,7 +116,7 @@ environment %[config.action_cable.allowed_request_origins = [ "\#{ENV['PROTOCOL'
 
 say 'apply application config...'
 application do
-  <<-EOF
+  <<-EOF.strip_heredoc
     config.generators.assets = false
     config.generators.helper = false
 
@@ -145,7 +145,7 @@ run 'mkdir -p app/assets/config && echo ' ' > app/assets/config/manifest.js'
 
 say 'apply controllers'
 inject_into_file 'app/controllers/application_controller.rb', after: "class ApplicationController < ActionController::Base\n" do
-  <<-EOF
+  <<-EOF.strip_heredoc
     include RenderExtension
   EOF
 end
