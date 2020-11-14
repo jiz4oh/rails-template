@@ -1,54 +1,13 @@
-USE_CUSTOM_CONFIG = no? 'Would you like to setup default configs? [y|n]'
+require_relative 'composer_helper'
 
-def ask_for_config(question, default_config)
-  result = USE_CUSTOM_CONFIG ? ask("#{question}  [#{default_config}]") : default_config
-  result || default_config
-end
+$USE_CUSTOM_CONFIG = no? 'Would you like to setup default configs? [y|n]'
 
-TEMPLATE_REPO_URL = ask_for_config( 'Where is the template-config dir?','https://raw.githubusercontent.com/jiz4oh/rails-template/master/files/')
-DEST_APP_ROOT_PATH = ask_for_config('What dir would you like to deploy on the server','/home/deploy/apps')
-DEVISE_MODEL_NAME = ask_for_config("What would you like the user model to be called?", "user")
-
-def remove_comments(file)
-  gsub_file(file, /^\s*#.*$\n/, '')
-end
-
-def remove_gem(*names)
-  names.each do |name|
-    gsub_file 'Gemfile', /gem '#{name}'.*\n/, ''
-  end
-end
-
-def replace_myapp(file)
-  gsub_file file, /myapp/, app_name, verbose: false
-end
-
-def replace_app_root_path(file)
-  gsub_file file, /\/data\/www/, DEST_APP_ROOT_PATH, verbose: false
-end
-
-def get_remote(src, dest = src)
-  if ENV['RAILS_TEMPLATE_DEBUG'].present?
-    repo = File.join(File.dirname(__FILE__), 'files/')
-  else
-    repo = TEMPLATE_REPO_URL
-  end
-  remote_file = repo + src
-  get(remote_file, dest, force: true)
-  replace_myapp(dest)
-  replace_app_root_path(dest)
-end
-
-def get_remote_dir(names, dir)
-  names.each do |name|
-    src = File.join(dir, name)
-    get_remote(src)
-  end
-end
-
-def remove_dir(dir)
-  run("rm -rf #{dir}")
-end
+$TEMPLATE_REPO_URL = ask_for_config('Where is the template-config dir?', 'https://raw.githubusercontent.com/jiz4oh/rails-template/master/files/')
+$DEST_APP_ROOT_PATH = ask_for_config('What dir would you like to deploy on the server', '/home/deploy/apps')
+DEVISE_MODEL_NAME = ask_for_config('What would you like the user model to be called?', "user")
+GIT_REPO_URL = ask_for_config('Where is git repository?', 'localhost')
+DEPLOY_SERVER = ask_for_config('Where do you want to deploy?', 'localhost')
+DEPLOY_USER = ask_for_config('Who would you like to deploy on the server?', 'deploy')
 
 say 'remove Gemfile comments'
 remove_comments('Gemfile')
@@ -118,11 +77,24 @@ gem 'capistrano-passenger', require: false
 gem 'capistrano3-nginx', require: false
 get_remote('Capfile')
 get_remote('config/deploy.rb')
-deploy_environments = %w(
-production.rb
-staging.rb
-)
-get_remote_dir(deploy_environments, 'config/deploy')
+create_file 'config/deploy/production.rb' do
+<<-EOF
+set :repo_url, '#{GIT_REPO_URL}'
+set :branch, :master
+server '#{DEPLOY_SERVER}', user: '#{DEPLOY_USER}', roles: %w{app db web}
+set :deploy_to, "/data/www/\#{fetch(:application)}"
+set :ssh_options, {forward_agent: true}
+EOF
+end
+create_file 'config/deploy/staging.rb' do
+<<-EOF
+set :repo_url, '#{GIT_REPO_URL}'
+set :branch, :staging
+server '#{DEPLOY_SERVER}', user: '#{DEPLOY_USER}', roles: %w{app db web}
+set :deploy_to, "/data/www/\#{fetch(:application)}_staging"
+set :ssh_options, {forward_agent: true}
+EOF
+end
 
 say 'apply figaro & secret config'
 gem 'figaro'
