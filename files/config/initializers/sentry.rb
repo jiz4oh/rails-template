@@ -4,7 +4,4 @@ Raven.configure do |config|
   config.sanitize_fields = Rails.application.config.filter_parameters.map(&:to_s)
   config.timeout = 10
   config.open_timeout = 10
-  config.transport_failure_callback = lambda { |event|
-
-  }
 end

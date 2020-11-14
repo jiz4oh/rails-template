@@ -1,5 +1,17 @@
-TEMPLATE_REPO_URL = 'https://raw.githubusercontent.com/jiz4oh/rails-template/master/files/'
-DEST_APP_ROOT_PATH = '/home/deploy/apps'
+USE_CUSTOM_CONFIG = no? 'Would you like to setup default configs? [y|n]'
+
+def ask_for_config(question, default_config)
+  result = USE_CUSTOM_CONFIG ? ask("#{question}  [#{default_config}]") : default_config
+  result || default_config
+end
+
+TEMPLATE_REPO_URL = ask_for_config( 'Where is the template-config dir?','https://raw.githubusercontent.com/jiz4oh/rails-template/master/files/')
+DEST_APP_ROOT_PATH = ask_for_config('What dir would you like to deploy on the server','/home/deploy/apps')
+DEVISE_MODEL_NAME = ask_for_config("What would you like the user model to be called?", "user")
+
+def remove_comments(file)
+  gsub_file(file, /^\s*#.*$\n/, '')
+end
 
 def remove_gem(*names)
   names.each do |name|
@@ -38,45 +50,51 @@ def remove_dir(dir)
   run("rm -rf #{dir}")
 end
 
-say 'remove comments'
-gsub_file('Gemfile', /^\s*#.*$\n/, '')
+say 'remove Gemfile comments'
+remove_comments('Gemfile')
 
 say 'Begin apply gems'
+say 'apply rspec test framework...'
+gem_group :development do
+  gem 'rails_apps_testing'
+end
+gem_group :development, :test do
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
+end
+gem_group :test do
+  gem 'database_cleaner'
+end
+after_bundle do
+  generate 'testing:configure', 'rspec --force'
+end
+
+say 'apply rails-i18n...'
+gem 'rails-i18n', '~> 6.0.0'
+
 say 'apply postgresql...'
 remove_gem('sqlite3')
 gem 'pg', '>= 1.1'
 get_remote('config/database.yml.example', 'config/database.yml')
 
-# environment variables set
-say 'apply figaro...'
-gem 'figaro'
-get_remote('config/application.yml.example', 'config/application.yml')
-get_remote('config/spring.rb')
-after_bundle do
-  say "Stop spring if exists"
-  run "spring stop"
-end
-
-say 'apply redis & sidekiq...'
+say 'apply redis'
 gem 'redis'
+
+say 'apply sidekiq...'
 gem 'sidekiq', '~> 5'
 get_remote('config/initializers/sidekiq.rb')
-get_remote('config/sidekiq.yml')
-inject_into_file 'config/application.rb', after: "class Application < Rails::Application\n" do
-  <<-EOF
-    config.active_job.queue_adapter = :sidekiq
-  EOF
-end
+get_remote('config/sidekiq.yml.example', 'config/sidekiq.yml')
+application "config.active_job.queue_adapter = :sidekiq"
 
 say 'apply bcrypt...'
 gem 'bcrypt'
 
-say 'apply devise & its plugins...'
+say 'apply devise'
 gem 'devise'
 gem 'devise-i18n'
 after_bundle do
-  generate 'devise:install'
-  generate 'devise Admin'
+  generate "devise:install"
+  generate "devise", DEVISE_MODEL_NAME
 end
 
 say 'apply cancancan'
@@ -84,9 +102,6 @@ gem 'cancancan'
 after_bundle do
   generate 'cancan:ability'
 end
-
-say 'apply rails-i18n...'
-gem 'rails-i18n', '~> 6.0.0'
 
 say 'apply kaminari'
 gem 'kaminari', '~> 1.1.1'
@@ -101,6 +116,7 @@ gem 'capistrano-rails', require: false
 gem 'capistrano-rvm', require: false
 gem 'capistrano-passenger', require: false
 gem 'capistrano3-nginx', require: false
+get_remote('Capfile')
 get_remote('config/deploy.rb')
 deploy_environments = %w(
 production.rb
@@ -108,40 +124,26 @@ staging.rb
 )
 get_remote_dir(deploy_environments, 'config/deploy')
 
-say 'apply annotate'
-gem 'annotate'
+say 'apply figaro & secret config'
+gem 'figaro'
+get_remote('config/application.yml.example', 'config/application.yml')
+get_remote('config/spring.rb')
+get_remote('config/secret.yml.example', 'config/secret.yml')
+after_bundle do
+  say "Stop spring if exists"
+  run "spring stop"
+end
 
 say 'apply sentry'
-gem "sentry-raven"
+gem 'sentry-raven'
 get_remote('config/initializers/sentry.rb')
-
-say 'apply rspec test framework...'
-gem_group :development do
-  gem 'rails_apps_testing'
-end
-gem_group :development, :test do
-  gem 'rspec-rails'
-  gem 'factory_bot_rails'
-end
-gem_group :test do
-  gem 'capybara'
-  gem 'database_cleaner'
-  gem 'selenium-webdriver'
-end
-after_bundle do
-  generate 'testing:configure', 'rspec --force'
-end
 say 'End apply gems'
 
 say 'apply action cable config...'
-inject_into_file 'config/environments/production.rb', after: "# Mount Action Cable outside main process or domain.\n" do
-  <<-EOF
-  config.action_cable.allowed_request_origins = [ "\#{ENV['PROTOCOL']}://\#{ENV['DOMAIN']}" ]
-  EOF
-end
+environment %[config.action_cable.allowed_request_origins = [ "\#{ENV['PROTOCOL']}://\#{ENV['DOMAIN']}" ]], env: :production
 
 say 'apply application config...'
-inject_into_file 'config/application.rb', after: "class Application < Rails::Application\n" do
+application do
   <<-EOF
     config.generators.assets = false
     config.generators.helper = false
@@ -153,15 +155,12 @@ inject_into_file 'config/application.rb', after: "class Application < Rails::App
   EOF
 end
 get_remote('config/routes.rb')
-get_remote('config/secret.yml')
 
 say 'apply other config'
 get_remote('config/puma.rb')
 get_remote('config/nginx.conf.example')
 get_remote('config/nginx.ssl.conf.example')
 get_remote('config/logrotate.conf.example')
-get_remote('config/monit.conf.example')
-get_remote('config/backup.rb.example')
 get_remote('db/seeds.rb')
 get_remote 'bin/setup'
 get_remote 'README.md'
@@ -170,8 +169,7 @@ get_remote('gitignore', '.gitignore')
 say 'Handle assets'
 remove_dir 'app/assets'
 # Fix error: Expected to find a manifest file in app/assets/config/manifest.js
-run "mkdir -p app/assets/config && echo '{}' > app/assets/config/manifest.js"
-get_remote('app/javascript/images/favicon.ico')
+run 'mkdir -p app/assets/config && echo ' ' > app/assets/config/manifest.js'
 
 say 'apply controllers'
 inject_into_file 'app/controllers/application_controller.rb', after: "class ApplicationController < ActionController::Base\n" do

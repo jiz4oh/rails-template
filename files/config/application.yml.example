@@ -2,8 +2,8 @@
 SECRET_KEY_BASE: ''
 
 # domain name used by action cable
-DOMAIN: ''
 PROTOCOL: http
+DOMAIN: ''
 
 # sidekiq db
 SIDEKIQ_DB: '1'

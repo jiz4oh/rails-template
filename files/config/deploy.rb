@@ -1,7 +1,6 @@
 `ssh-add`
 
 set :application, "my_app"
-set :repo_url, "git@github.com:xx/xxx.git"
 set :whenever_identifier, -> {"#{fetch(:application)}_#{fetch(:stage)}"}
 set :passenger_restart_with_touch, true
 
@@ -26,9 +25,9 @@ config/application.yml
 append :linked_files, *shared_files
 
 namespace :deploy do
-  after :finishing, :'passenger:restart'
   after :finishing, :setup
   after :finishing, :clear_bootsnap
+  after :finishing, :restart_server
 end
 
 task :setup do
@@ -51,5 +50,10 @@ desc "Clear bootsnap cache"
 task :clear_bootsnap do
   command %[echo "Clear bootsnap cache..."]
   command %[rm -rf "#{fetch(:shared_path)}/tmp/bootsnap-*"]
+end
+
+desc "restart server"
+task :restart_server do
+  command %[touch "#{fetch(:shared_path)}/tmp/restart.txt"]
 end
 
