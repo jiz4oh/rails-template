@@ -1,4 +1,4 @@
-require_relative 'composer_helper'
+require_relative 'composer_helper.rb'
 
 $USE_CUSTOM_CONFIG = no? 'Would you like to setup default configs? [y|n]'
 
