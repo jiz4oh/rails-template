@@ -1,7 +1,6 @@
 `ssh-add`
 
-set :application, "my_app"
-set :whenever_identifier, -> {"#{fetch(:application)}_#{fetch(:stage)}"}
+set :application, "myapp"
 set :passenger_restart_with_touch, true
 
 shared_dirs = %w(
