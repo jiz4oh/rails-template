@@ -33,7 +33,7 @@ def get_remote(src, dest = src)
   if ENV['RAILS_TEMPLATE_DEBUG'].present?
     repo = File.join(File.dirname(__FILE__), 'files/')
   else
-    repo = 'https://raw.githubusercontent.com/jiz4oh/rails-template/master/files/'
+    repo = 'https://cdn.jsdelivr.net/gh/jiz4oh/rails-template/files/'
   end
   remote_file = repo + src
   get(remote_file, dest, force: true)
