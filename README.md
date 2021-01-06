@@ -57,7 +57,7 @@ Then,
 
 2. Create your own rails app applying `rails-template`
 
-    `$ rails new myapp -m https://raw.githubusercontent.com/jiz4oh/rails-template/master/composer.rb`
+    `$ rails new myapp -m https://cdn.jsdelivr.net/gh/jiz4oh/rails-template/composer.rb`
 
     Important!! replace `myapp` to your real project name, we will generate lots of example files by this name.
 
