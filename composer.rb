@@ -72,7 +72,7 @@ after_bundle do
 end
 
 say 'apply rails-i18n...'
-gem 'rails-i18n', '~> 6.0.0'
+gem 'rails-i18n'
 
 say 'apply postgresql...'
 remove_gem('sqlite3')
@@ -83,7 +83,7 @@ say 'apply redis'
 gem 'redis'
 
 say 'apply sidekiq...'
-gem 'sidekiq', '~> 5'
+gem 'sidekiq'
 get_remote('config/initializers/sidekiq.rb')
 get_remote('config/sidekiq.yml.example', 'config/sidekiq.yml')
 application "config.active_job.queue_adapter = :sidekiq"
