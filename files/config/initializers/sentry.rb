@@ -1,7 +1,14 @@
-Raven.configure do |config|
+Sentry.init do |config|
   return if Rails.env.development? || Rails.env.test?
+
   config.dsn = ENV['SENTRY_SECRET']
-  config.sanitize_fields = Rails.application.config.filter_parameters.map(&:to_s)
-  config.timeout = 10
-  config.open_timeout = 10
+  config.breadcrumbs_logger = [:active_support_logger]
+
+  # To activate performance monitoring, set one of these options.
+  # We recommend adjusting the value in production:
+  config.traces_sample_rate = 0.5
+  # or
+  config.traces_sampler = lambda do |context|
+    true
+  end
 end

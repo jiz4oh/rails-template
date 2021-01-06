@@ -149,7 +149,8 @@ after_bundle do
 end
 
 say 'apply sentry'
-gem 'sentry-raven'
+gem "sentry-rails"
+gem "sentry-sidekiq"
 get_remote('config/initializers/sentry.rb')
 say 'End apply gems'
 
