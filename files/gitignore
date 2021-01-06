@@ -16,6 +16,8 @@
 /tmp/*
 !/log/.keep
 !/tmp/.keep
+*.log
+*.tmp
 *.swp
 **.orig
 *.old
@@ -27,17 +29,19 @@
 # Ignore uploaded files in development.
 /storage/*
 !/storage/.keep
+/public/uploads/*
 
-/public/assets
+# Ignore assets
 /public/packs
 /public/packs-test
+/public/assets
+
+# Ignore javascript
 /node_modules
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
-/public/uploads/*
-/public/assets/*
-/tags
+.env*.local
 
 # Ignore secrets
 /config/application.yml
@@ -47,9 +51,9 @@ yarn-debug.log*
 
 # Ignore env files
 .env
+.vagrant
 
 # Editor directories and files
-.idea
 .idea
 .vscode
 *.suo
@@ -57,3 +61,6 @@ yarn-debug.log*
 *.njsproj
 *.sln
 *.sw*
+*.sublime-workspace
+.generators
+.rakeTasks
