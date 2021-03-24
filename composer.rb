@@ -5,8 +5,6 @@ def ask_for_config(question, default_config)
   result.presence || default_config
 end
 
-DEVISE_MODEL_NAME = ask_for_config('What would you like the user model to be called?', "user")
-
 def remove_comments(file)
   gsub_file(file, /^\s*#.*$\n/, '')
 end
@@ -90,10 +88,6 @@ gem 'bcrypt'
 say 'apply devise'
 gem 'devise'
 gem 'devise-i18n'
-after_bundle do
-  generate "devise:install"
-  generate "devise", DEVISE_MODEL_NAME
-end
 
 say 'apply cancancan'
 gem 'cancancan'
