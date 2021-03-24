@@ -5,7 +5,6 @@ def ask_for_config(question, default_config)
   result.presence || default_config
 end
 
-DEST_APP_ROOT_PATH = ask_for_config('What dir would you like to deploy on the server', '/home/deploy/apps')
 DEVISE_MODEL_NAME = ask_for_config('What would you like the user model to be called?', "user")
 GIT_REPO_URL = ask_for_config('Where is git repository?', 'localhost')
 DEPLOY_SERVER = ask_for_config('Where do you want to deploy?', 'localhost')
@@ -26,7 +25,7 @@ def replace_myapp(file)
 end
 
 def replace_app_root_path(file)
-  gsub_file file, /\/data\/www/, DEST_APP_ROOT_PATH, verbose: false
+  gsub_file file, /\/data\/www/, '$HOME/apps', verbose: false
 end
 
 def get_remote(src, dest = src)
