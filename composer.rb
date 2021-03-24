@@ -175,7 +175,6 @@ get_remote('config/puma.rb')
 get_remote('config/nginx.conf.example')
 get_remote('config/nginx.ssl.conf.example')
 get_remote('config/logrotate.conf.example')
-get_remote('db/seeds.rb')
 get_remote 'bin/setup'
 get_remote 'README.md'
 get_remote('gitignore', '.gitignore')
