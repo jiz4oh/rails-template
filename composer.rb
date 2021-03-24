@@ -82,7 +82,7 @@ say 'apply redis'
 gem 'redis'
 
 say 'apply sidekiq...'
-gem 'sidekiq'
+gem 'sidekiq', '< 7'
 get_remote('config/initializers/sidekiq.rb')
 get_remote('config/sidekiq.yml.example', 'config/sidekiq.yml')
 application "config.active_job.queue_adapter = :sidekiq"
