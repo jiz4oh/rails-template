@@ -69,7 +69,8 @@ say 'apply rails-i18n...'
 gem 'rails-i18n'
 
 say 'apply postgresql...'
-remove_gem('sqlite3')
+remove_gem 'sqlite3'
+remove_gem 'pg'
 gem 'pg', '>= 1.1'
 get_remote('config/database.yml.example', 'config/database.yml')
 
@@ -83,6 +84,7 @@ get_remote('config/sidekiq.yml.example', 'config/sidekiq.yml')
 application "config.active_job.queue_adapter = :sidekiq"
 
 say 'apply bcrypt...'
+remove_gem 'bcrypt'
 gem 'bcrypt'
 
 say 'apply devise'
