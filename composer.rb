@@ -6,9 +6,6 @@ def ask_for_config(question, default_config)
 end
 
 DEVISE_MODEL_NAME = ask_for_config('What would you like the user model to be called?', "user")
-GIT_REPO_URL = ask_for_config('Where is git repository?', 'localhost')
-DEPLOY_SERVER = ask_for_config('Where do you want to deploy?', 'localhost')
-DEPLOY_USER = ask_for_config('Who would you like to deploy on the server?', 'deploy')
 
 def remove_comments(file)
   gsub_file(file, /^\s*#.*$\n/, '')
@@ -108,34 +105,6 @@ say 'apply kaminari'
 gem 'kaminari', '~> 1.1.1'
 after_bundle do
   generate 'kaminari:config'
-end
-
-say 'apply capistrano & its plugins...'
-gem "capistrano", "~> 3", require: false
-gem 'capistrano-sidekiq', require: false
-gem 'capistrano-rails', require: false
-gem 'capistrano-rvm', require: false
-gem 'capistrano-passenger', require: false
-gem 'capistrano3-nginx', require: false
-get_remote('Capfile')
-get_remote('config/deploy.rb')
-create_file 'config/deploy/production.rb' do
-  <<-EOF.strip_heredoc
-    set :repo_url, '#{GIT_REPO_URL}'
-    set :branch, :master
-    server '#{DEPLOY_SERVER}', user: '#{DEPLOY_USER}', roles: %w{app db web}
-    set :deploy_to, "/data/www/\#{fetch(:application)}"
-    set :ssh_options, {forward_agent: true}
-  EOF
-end
-create_file 'config/deploy/staging.rb' do
-  <<-EOF.strip_heredoc
-    set :repo_url, '#{GIT_REPO_URL}'
-    set :branch, :staging
-    server '#{DEPLOY_SERVER}', user: '#{DEPLOY_USER}', roles: %w{app db web}
-    set :deploy_to, "/data/www/\#{fetch(:application)}_staging"
-    set :ssh_options, {forward_agent: true}
-  EOF
 end
 
 say 'apply figaro & secret config'
